@@ -19,28 +19,30 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         playerRb.velocity = new Vector2(Input.GetAxis("Horizontal") * speed, playerRb.velocity.y);
-
-        if (Input.GetAxis("Horizontal") == 0) {
-            playerAnimator.SetBool("isWalking", false);
-        } else if (Input.GetAxis("Horizontal") < 0) {
-            playerAnimator.SetBool("isWalking", true);
+        playerAnimator.SetBool("isWalking", sign(Input.GetAxis("Horizontal")) != 0);
+        if (playerRb.velocity.x < 0) {
             GetComponent<SpriteRenderer>().flipX = false;
-        } else if (Input.GetAxis("Horizontal") > 0) {
-            playerAnimator.SetBool("isWalking", true);
+        }
+        if (playerRb.velocity.x > 0) {
             GetComponent<SpriteRenderer>().flipX = true;
-        } 
-
+        }
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
             playerRb.AddForce(Vector2.up * jumpSpeed);
             isGrounded = false;
-            playerAnimator.SetTrigger("jump");
         }
+        playerAnimator.SetBool("onGround", isGrounded);
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.tag == "Ground") {
             isGrounded = true;
         }
-        //isGrounded = (collision.gameObject.tag == "Ground");
+    }
+
+    private float sign(float val) {
+        if (val > 0) val = 1;
+        if (val < 0) val = -1;
+        if (val == 0) val = 0;
+        return val;
     }
 }
